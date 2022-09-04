@@ -11,7 +11,9 @@ import org.kyrian.common.model.Report;
 import org.kyrian.common.util.ReportGeneratorUtility;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Unit test for simple App.
