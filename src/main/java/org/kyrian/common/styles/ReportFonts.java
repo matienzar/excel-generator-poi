@@ -9,19 +9,19 @@ public final class ReportFonts {
     private static final String FONT_NAME_SANS_SERIF = "SansSerif";
 
 
-    public static Font getFuenteDatoTabla(Workbook workbook) {
-        Font fuenteDatoTabla = workbook.createFont();
-        fuenteDatoTabla.setFontName(FONT_NAME_SANS_SERIF);
-        fuenteDatoTabla.setFontHeightInPoints((short) 12);
-        return fuenteDatoTabla;
+    public static Font getDataFont(Workbook workbook) {
+        Font dataFont = workbook.createFont();
+        dataFont.setFontName(FONT_NAME_SANS_SERIF);
+        dataFont.setFontHeightInPoints((short) 12);
+        return dataFont;
     }
 
-    public static Font getFuenteEncabezadoTabla(Workbook workbook) {
-        Font fuenteEncabezadoTabla = workbook.createFont();
-        fuenteEncabezadoTabla.setFontName(FONT_NAME_SANS_SERIF);
-        fuenteEncabezadoTabla.setFontHeightInPoints((short) 12);
-        fuenteEncabezadoTabla.setBold(true);
+    public static Font getHeaderFont(Workbook workbook) {
+        Font headerFont = workbook.createFont();
+        headerFont.setFontName(FONT_NAME_SANS_SERIF);
+        headerFont.setFontHeightInPoints((short) 12);
+        headerFont.setBold(true);
 
-        return fuenteEncabezadoTabla;
+        return headerFont;
     }
 }

@@ -3,7 +3,7 @@ package org.kyrian.common.styles;
 import org.apache.poi.ss.usermodel.*;
 
 /**
- * Estilo asociado al encabezado
+ * Cell style associated to header cell
  *
  * @author matienzar
  * @since 202209.1.0
@@ -21,7 +21,7 @@ public final class HeaderStyle {
         headerStyle.setFillPattern(FillPatternType.NO_FILL);
         headerStyle.setBorderBottom(BorderStyle.THICK);
         headerStyle.setAlignment(HorizontalAlignment.CENTER);
-        headerStyle.setFont(ReportFonts.getFuenteEncabezadoTabla(workbook));
+        headerStyle.setFont(ReportFonts.getHeaderFont(workbook));
         return headerStyle;
     }
 }

@@ -16,9 +16,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.*;
  */
 enum JacksonJsonInit {
     INSTANCE;
-
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
     static {
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

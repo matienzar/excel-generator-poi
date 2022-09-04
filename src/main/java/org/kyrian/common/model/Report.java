@@ -8,16 +8,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Clase usada para el mapeo a un objeto de tipo Informe
+ * Mapping to a Report Object
  *
  * @author matienzar
  * @since 202209.1.0
  */
 public class Report {
 
-    private TipoInforme tipo;
-
-    private String nombreInforme;
+    private String reportName;
 
     private String sql;
 
@@ -30,15 +28,15 @@ public class Report {
     private List<Column> columnList;
 
     @JsonIgnore
-    private List<List<Object>> datos;
+    private List<List<Object>> data;
 
-    public void addFila(List<Object> fila){
-        if (datos == null){
-            datos = new ArrayList<>();
+    public void addRow(List<Object> row){
+        if (data == null){
+            data = new ArrayList<>();
         }
-        datos.add(fila);
+        data.add(row);
     }
-    public void addColumna(Column column){
+    public void addColumn(Column column){
         if (columnList == null){
             columnList = new ArrayList<>();
         }
@@ -46,20 +44,12 @@ public class Report {
     }
     private String pathToExport;
 
-    public TipoInforme getTipo() {
-        return tipo;
+    public String getReportName() {
+        return reportName;
     }
 
-    public void setTipo(TipoInforme tipo) {
-        this.tipo = tipo;
-    }
-
-    public String getNombreInforme() {
-        return nombreInforme;
-    }
-
-    public void setNombreInforme(String nombreInforme) {
-        this.nombreInforme = nombreInforme;
+    public void setReportName(String reportName) {
+        this.reportName = reportName;
     }
 
     public String getSql() {
@@ -78,20 +68,20 @@ public class Report {
         this.parameters = parameters;
     }
 
-    public List<Column> getColumnaList() {
+    public List<Column> getColumnList() {
         return columnList;
     }
 
-    public void setColumnaList(List<Column> columnList) {
+    public void setColumnList(List<Column> columnList) {
         this.columnList = columnList;
     }
 
-    public List<List<Object>> getDatos() {
-        return datos;
+    public List<List<Object>> getData() {
+        return data;
     }
 
-    public void setDatos(List<List<Object>> datos) {
-        this.datos = datos;
+    public void setData(List<List<Object>> data) {
+        this.data = data;
     }
 
     public String getPathToExport() {

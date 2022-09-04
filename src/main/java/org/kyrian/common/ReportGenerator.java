@@ -13,7 +13,6 @@ import org.kyrian.common.model.ExportTo;
 import org.kyrian.common.model.Report;
 import org.kyrian.common.model.DataType;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,24 +25,27 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import static org.slf4j.LoggerFactory.*;
+
 
 public class ReportGenerator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReportGenerator.class);
-    private static final int TAMANYO_X_CARACTER = 256;
-    private Report informe;
+    private static final Logger LOGGER = getLogger(ReportGenerator.class);
+    private static final int WIDTH_BY_CHAR = 256;
+    public static final String HEADER = "HEADER";
+    private Report report;
 
-    private Map<String, CellStyle> estilos = new HashMap<>();
+    private final Map<String, CellStyle> styles = new HashMap<>();
 
     private ReportGenerator() {
-
+        // DO NOTHING
     }
 
-    public ReportGenerator(Report informe) {
-        this.informe = informe;
+    public ReportGenerator(Report report) {
+        this.report = report;
     }
 
-    public String generaInforme(ExportTo exportTo) {
+    public String getReport(ExportTo exportTo) {
         switch (exportTo) {
             case EXCEL:
                 return toExcel();
@@ -58,7 +60,7 @@ public class ReportGenerator {
         Path filePath = getFilePath("xlsx");
         if (filePath != null) {
             try (FileOutputStream outputStream = new FileOutputStream(filePath.toString()); Workbook workbook = new XSSFWorkbook()) {
-                Sheet sheet = workbook.createSheet(informe.getNombreInforme());
+                Sheet sheet = workbook.createSheet(report.getReportName());
                 initStyles(sheet);
                 addColumns(sheet);
                 addHeader(sheet);
@@ -67,7 +69,7 @@ public class ReportGenerator {
                 workbook.write(outputStream);
                 return filePath.toAbsolutePath().toString();
             } catch (IOException e) {
-                throw new ReportGeneratorException("Generando el informe excel para:" + informe.getNombreInforme(), e);
+                throw new ReportGeneratorException("Generating the excel report for:" + report.getReportName(), e);
             }
         }
         return null;
@@ -75,13 +77,13 @@ public class ReportGenerator {
     }
 
     private void initStyles(final Sheet sheet){
-        estilos.put("ENCABEZADO", HeaderStyle.get(sheet.getWorkbook()));
+        styles.put(HEADER, HeaderStyle.get(sheet.getWorkbook()));
     }
 
     private void autoSizeColumns(final Sheet sheet) {
         //Auto size all the columns
-        Row filaInicial = sheet.getRow(0);
-        Iterator<Cell> cellIterator = filaInicial.cellIterator();
+        Row firstRow = sheet.getRow(0);
+        Iterator<Cell> cellIterator = firstRow.cellIterator();
         while (cellIterator.hasNext()) {
             Cell cell = cellIterator.next();
             if (cell.getStringCellValue() != null && !cell.getStringCellValue().isEmpty()) {
@@ -91,68 +93,68 @@ public class ReportGenerator {
     }
 
     private Path getFilePath(final String fileExtension) {
-        String path = informe.getPathToExport();
-        LOGGER.info("Path del informe: {}", path);
+        String path = report.getPathToExport();
+        LOGGER.info("Path: {}", path);
         if (path == null || path.trim().isEmpty()) {
             try {
                 Path filePathTemp = Files.createTempFile("app_", "." + fileExtension);
-                LOGGER.info("Fichero temporal generado: {}", filePathTemp);
+                LOGGER.info("Temporal file: {}", filePathTemp);
                 return filePathTemp;
             } catch (IOException e) {
-                LOGGER.error("No se ha podido generar el fichero temporal", e);
+                LOGGER.error("Failed to generate temporary file", e);
                 return null;
             }
         } else {
             String fileName = UUID.randomUUID() + "." + fileExtension;
             Path filePath = Paths.get(path, fileName);
-            LOGGER.info("Fichero generado: {}", filePath);
+            LOGGER.info("File generated: {}", filePath);
             return filePath;
         }
     }
 
     private void addDataRow(final Sheet sheet) {
-        final AtomicInteger fila = new AtomicInteger(1);
-        if (informe.getDatos() != null && !informe.getDatos().isEmpty()) {
-            for (List<Object> filas : informe.getDatos()) {
-                int posColumna = 0;
-                Row row = sheet.createRow(fila.get());
-                for (Object campo : filas) {
-                    Column column = informe.getColumnaList().get(posColumna);
-                    Cell cell = row.createCell(posColumna);
-                    setCellValue(cell, campo, column.getTipoDato());
+        final AtomicInteger reportRow = new AtomicInteger(1);
+        if (report.getData() != null && !report.getData().isEmpty()) {
+            for (List<Object> rows : report.getData()) {
+                int columnPos = 0;
+                Row row = sheet.createRow(reportRow.get());
+                for (Object field : rows) {
+                    Column column = report.getColumnList().get(columnPos);
+                    Cell cell = row.createCell(columnPos);
+                    setCellValue(cell, field, column.getDataType());
                     cell.setCellStyle(column.getCellStyle());
-                    LOGGER.debug("Valor de la celda a rellenar {}-{} : {} - {}", fila, posColumna, campo, column.getTipoDato().horizontalAlignment);
+                    LOGGER.debug("Value of the cell to fill {}-{} : {} - {}", reportRow, columnPos, field, column.getDataType().horizontalAlignment);
 
-                    posColumna++;
+                    columnPos++;
                 }
-                fila.getAndIncrement();
+                reportRow.getAndIncrement();
             }
-        } else if (informe.getSql() != null && !informe.getSql().trim().isEmpty()) {
+        } else if (report.getSql() != null && !report.getSql().trim().isEmpty()) {
             // Estamos ante un informe para generar a través de una SQL
-            Session session = informe.getEm().unwrap(Session.class);
+            Session session = report.getEm().unwrap(Session.class);
             // https://thorben-janssen.com/get-query-results-stream-hibernate-5/
-            NativeQuery query = session.createNativeQuery(informe.getSql());
-            if (informe.getParameters() != null && !informe.getParameters().isEmpty()) {
-                for (Map.Entry<String, Object> parametro : informe.getParameters().entrySet()) {
-                    query.setParameter(parametro.getKey(), parametro.getValue());
+            NativeQuery query = session.createNativeQuery(report.getSql());
+            if (report.getParameters() != null && !report.getParameters().isEmpty()) {
+                for (Map.Entry<String, Object> parameter : report.getParameters().entrySet()) {
+                    query.setParameter(parameter.getKey(), parameter.getValue());
                 }
             }
             query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
             Stream<Map<String, Object>> stream = query.stream();
-            stream.forEach(m -> addDataRow(sheet, fila.getAndIncrement(), m));
+            stream.forEach(m -> addDataRow(sheet, reportRow.getAndIncrement(), m));
         }
 
     }
 
-    private void addDataRow(final Sheet sheet, final int fila, Map<String, Object> datos) {
-        int posColumna = 0;
-        Row row = sheet.createRow(fila);
-        for (Column column : informe.getColumnaList()) {
-            Cell cell = row.createCell(posColumna);
-            setCellValue(cell, datos.get(column.getColumnaSql().toUpperCase()), column.getTipoDato());
+    private void addDataRow(final Sheet sheet, final int rowPos, Map<String, Object> data) {
+        int posColumn = 0;
+        Row row = sheet.createRow(rowPos);
+        for (Column column : report.getColumnList()) {
+            Cell cell = row.createCell(posColumn);
+            setCellValue(cell, data.get(column.getSqlColumnName().toUpperCase()), column.getDataType());
             cell.setCellStyle(column.getCellStyle());
-            LOGGER.debug("Valor de la celda a rellenar {}-{} : {} - {}", fila, posColumna, datos.get(column.getColumnaSql().toUpperCase()), column.getTipoDato().horizontalAlignment);
-            posColumna++;
+            LOGGER.debug("Value of the cell to fill {}-{} : {} - {}", rowPos, posColumn, data.get(column.getSqlColumnName().toUpperCase()), column.getDataType().horizontalAlignment);
+            posColumn++;
         }
     }
 
@@ -162,11 +164,11 @@ public class ReportGenerator {
             cell.setCellValue("");
         } else {
             switch (cellType) {
-                case FECHA:
-                case FECHA_LARGA:
-                case FECHA_HORA:
-                case HORA:
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(cellType.formato);
+                case DATE:
+                case LONG_DATE:
+                case DATE_HOUR:
+                case HOUR:
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(cellType.format);
                     LocalDate dateTime = LocalDate.parse(cellValue.toString(), formatter);
                     cell.setCellValue(dateTime);
                 default:
@@ -177,29 +179,27 @@ public class ReportGenerator {
 
     private void addColumns(final Sheet sheet) {
         int columPos = 0;
-        for (Column column : informe.getColumnaList()) {
-            sheet.setColumnWidth(columPos++, column.getTipoDato().numCaracteres * TAMANYO_X_CARACTER);
+        for (Column column : report.getColumnList()) {
+            sheet.setColumnWidth(columPos++, column.getDataType().numChars * WIDTH_BY_CHAR);
         }
     }
 
     private void addHeader(final Sheet sheet) {
         Row header = sheet.createRow(0);
 
-        // HEADER FIJO
+        // FIX HEADER
         sheet.createFreezePane(0, 1);
 
         int columPos = 0;
-        for (Column column : informe.getColumnaList()) {
+        for (Column column : report.getColumnList()) {
             Cell headerCell = header.createCell(columPos++);
-            headerCell.setCellValue(column.getNombre());
-            headerCell.setCellStyle(estilos.get("ENCABEZADO"));
-
-            // Definimos el estilo para esa columna a nivel de datos para reaprovecharlo
-            column.setCellStyle(DataStyle.get(sheet.getWorkbook(), column.getTipoDato().horizontalAlignment));
+            headerCell.setCellValue(column.getName());
+            headerCell.setCellStyle(styles.get(HEADER));
+            column.setCellStyle(DataStyle.get(sheet.getWorkbook(), column.getDataType().horizontalAlignment));
         }
 
-        LOGGER.info("Última celda {}", header.getLastCellNum());
-        LOGGER.info("Última celda en excel {}", header.getCell(header.getLastCellNum() - 1).getAddress().formatAsString());
+        LOGGER.debug("Last cell {}", header.getLastCellNum());
+        LOGGER.debug("Last cell on excel {}", header.getCell(header.getLastCellNum() - 1).getAddress().formatAsString());
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:" + header.getCell(header.getLastCellNum() - 1).getAddress().formatAsString()));
     }

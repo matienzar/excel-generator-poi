@@ -4,35 +4,35 @@ import org.apache.poi.ss.usermodel.CellStyle;
 
 public class Column {
 
-    private String columnaSql;
-    private DataType tipoDato;
+    private String sqlColumnName;
+    private DataType dataType;
 
     private CellStyle cellStyle;
 
-    private String nombre;
+    private String name;
 
-    public String getColumnaSql() {
-        return columnaSql;
+    public String getSqlColumnName() {
+        return sqlColumnName;
     }
 
-    public void setColumnaSql(String columnaSql) {
-        this.columnaSql = columnaSql;
+    public void setSqlColumnName(String sqlColumnName) {
+        this.sqlColumnName = sqlColumnName;
     }
 
-    public DataType getTipoDato() {
-        return tipoDato;
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setTipoDato(DataType tipoDato) {
-        this.tipoDato = tipoDato;
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public CellStyle getCellStyle() {

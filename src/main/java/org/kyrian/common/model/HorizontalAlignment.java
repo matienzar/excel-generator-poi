@@ -1,15 +1,15 @@
 package org.kyrian.common.model;
 
 public enum HorizontalAlignment {
-    IZQUIERDA, DERECHA, CENTRADO, JUSTIFICADO;
+    LEFT, RIGHT, CENTER, JUSTIFY;
 
     public final org.apache.poi.ss.usermodel.HorizontalAlignment getHorizontalAlignment(){
         switch (this){
-            case DERECHA:
+            case RIGHT:
                 return org.apache.poi.ss.usermodel.HorizontalAlignment.RIGHT;
-            case IZQUIERDA:
+            case LEFT:
                 return org.apache.poi.ss.usermodel.HorizontalAlignment.LEFT;
-            case CENTRADO:
+            case CENTER:
                 return org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER;
             default:
                 return org.apache.poi.ss.usermodel.HorizontalAlignment.JUSTIFY;

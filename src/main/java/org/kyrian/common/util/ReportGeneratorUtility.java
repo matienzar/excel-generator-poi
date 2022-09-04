@@ -18,40 +18,29 @@ public final class ReportGeneratorUtility {
     }
 
     /**
-     * Obtenemos el objeto informe a partir del json proporcionado
-     * @param informeJson Ejemplo:
+     * Report from a json
+     * @param reportJson Example:
      * {
-     *    "nombreInforme":"prueba generador",
-     *    "columnaList":[
-     *       {
-     *          "tipoDato":"FECHA",
-     *          "nombre":"Fecha"
-     *       },
-     *       {
-     *          "tipoDato":"EMPRESA",
-     *          "nombre":"Tipo empresa"
-     *       }
-     *    ],
-     *    "datos":[
-     *       [
-     *          "01/02/22",
-     *          "Pavasal Empresa Constructora"
-     *       ],
-     *       [
-     *          "05/06/23",
-     *          "Mercadona"
-     *       ]
-     *    ],
-     *    "pathToExport":"/Users/matienzar/Downloads"
+     *   "reportName": "Test from data",
+     *   "columnList": [
+     *     {
+     *       "dataType": "DATE",
+     *       "name": "Date"
+     *     },
+     *     {
+     *       "dataType": "COMPANY_NAME",
+     *       "name": "Company Name"
+     *     }
+     *   ]
      * }
-     * @return
+     * @return Report mapped from json
      */
-    public static Report fromJson(String informeJson) {
+    public static Report fromJson(String reportJson) {
         try {
-            return JacksonJsonInit.INSTANCE.getObjectMapper().readValue(informeJson, new TypeReference<Report>() {
+            return JacksonJsonInit.INSTANCE.getObjectMapper().readValue(reportJson, new TypeReference<Report>() {
             });
         } catch (IOException e) {
-            throw new ReportGeneratorException("Convirtiendo el json al objeto Informe:" + informeJson, e);
+            throw new ReportGeneratorException("Converting the json to Report object:" + reportJson, e);
         }
     }
 
@@ -59,7 +48,7 @@ public final class ReportGeneratorUtility {
         try {
             return JacksonJsonInit.INSTANCE.getObjectMapper().writeValueAsString(informe);
         } catch (IOException e) {
-            throw new ReportGeneratorException("Convirtiendo el json al objeto Informe", e);
+            throw new ReportGeneratorException("Converting the json to Report object", e);
         }
     }
 
