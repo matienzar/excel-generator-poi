@@ -1,0 +1,19 @@
+<project basedir="." name="excel-generator-poi">
+
+    <!-- Nuevas versiones -->
+    <target name="versions">
+        <exec executable="mvn" failonerror="true" searchpath="true">
+            <arg value="versions:display-dependency-updates" />
+            <arg value="-DprocessDependencyManagement=false"/>
+            <arg value="-DlogOutput=false"/>
+        </exec>
+    </target>
+
+    <target name="plugin-versiones">
+        <exec executable="mvn" failonerror="true" searchpath="true">
+            <arg value="versions:display-plugin-updates" />
+            <arg value="-DlogOutput=false"/>
+        </exec>
+    </target>
+
+</project>
